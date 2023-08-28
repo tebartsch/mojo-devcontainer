@@ -1,0 +1,41 @@
+{
+  "name": "mojo-dev-container",
+  "containerUser": "${localEnv:USER}",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "USER": "${localEnv:USER}"
+    }
+  },
+  // These arguments are added to the docker run command of this dev container
+  "runArgs": [
+    // Set a proper name of the dev-container
+    "--name=mojo-dev-${localEnv:USER}",
+    // Set flags to enable debugging in dev container
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  // Persist data between container instantiations
+  "mounts": [
+    // Persist the user profile (like bash history)
+    // "source=mojo-home-${localEnv:USER},target=/home/${localEnv:USER},type=volume",
+    // Anonymous mount that gets destroyed on rebuild so that vscode reinstalls extensions/dotfiles.
+    // "target=/home/${localEnv:USER}/.vscode-server,type=volume"
+  ],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+      "extensions": [
+        "modular-mojotools.vscode-mojo",
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ]
+    },
+    "workspaceFolder": "${localWorkspaceFolder}",
+    "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=cached"
+  },
+  "initializeCommand": "${localWorkspaceFolder}/.devcontainer/test-auth.sh"
+}
